@@ -1015,6 +1015,7 @@ impl crate::Instance for Instance {
                                 }
                             }
                     };
+                    println!("EGL DISPLAY: {:#?}", display);
 
                     let new_inner = Inner::create(
                         self.flags,
