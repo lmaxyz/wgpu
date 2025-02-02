@@ -998,6 +998,9 @@ impl crate::Instance for Instance {
                     use std::ops::DerefMut;
                     let display_attributes = [khronos_egl::ATTRIB_NONE];
 
+                    log::warn!("WAYLAND DISPLAY REF: {:#?}", inner.wl_display.as_ref());
+                    log::warn!("DISPLAY HANDLE PTR: {:#?}", display_handle.display.as_ptr());
+
                     let display = unsafe {
                         match inner
                             .egl
@@ -1011,11 +1014,13 @@ impl crate::Instance for Instance {
                                     ).unwrap()
                                 },
                                 None => {
+                                    log::warn!("Try to get display with egl 1.4");
+                                    // inner.egl.make_current();
                                     inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
                                 }
                             }
                     };
-                    println!("EGL DISPLAY: {:#?}", display);
+                    log::warn!("EGL DISPLAY: {:#?}", display);
 
                     let new_inner = Inner::create(
                         self.flags,
