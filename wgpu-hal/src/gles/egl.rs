@@ -1015,11 +1015,10 @@ impl crate::Instance for Instance {
                                     ).unwrap()
                                 },
                                 None => {
-                                    log::warn!("Try to get display with egl 1.4");
-                                    inner.egl.make_current();
-                                    // let native_display_type = inner.egl.instance.get;
+                                    log::warn!("Failed to upcast to EGL 1.5, trying to continue with 1.4.");
+                                    // inner.egl.make_current();
                                     // inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
-                                    inner.egl.instance.get_current_display().unwrap()
+                                    inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
                                 }
                             }
                     };
@@ -1034,6 +1033,8 @@ impl crate::Instance for Instance {
 
                     let old_inner = std::mem::replace(inner.deref_mut(), new_inner);
                     inner.wl_display = Some(display_handle.display.as_ptr());
+
+                    log::debug!("New Instance inner created: {:#?}", inner);
 
                     drop(old_inner);
                 }
