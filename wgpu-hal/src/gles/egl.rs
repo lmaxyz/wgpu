@@ -1016,7 +1016,9 @@ impl crate::Instance for Instance {
                                 None => {
                                     log::warn!("Try to get display with egl 1.4");
                                     // inner.egl.make_current();
-                                    inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
+                                    // let native_display_type = inner.egl.instance.get;
+                                    // inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
+                                    inner.egl.instance.get_current_display().unwrap()
                                 }
                             }
                     };
