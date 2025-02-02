@@ -999,6 +999,7 @@ impl crate::Instance for Instance {
                     let display_attributes = [khronos_egl::ATTRIB_NONE];
 
                     log::warn!("WAYLAND DISPLAY REF: {:#?}", inner.wl_display.as_ref());
+                    log::warn!("EGL DISPLAY REF: {:#?}", inner.egl.display.as_ptr());
                     log::warn!("DISPLAY HANDLE PTR: {:#?}", display_handle.display.as_ptr());
 
                     let display = unsafe {
@@ -1015,7 +1016,7 @@ impl crate::Instance for Instance {
                                 },
                                 None => {
                                     log::warn!("Try to get display with egl 1.4");
-                                    // inner.egl.make_current();
+                                    inner.egl.make_current();
                                     // let native_display_type = inner.egl.instance.get;
                                     // inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
                                     inner.egl.instance.get_current_display().unwrap()
