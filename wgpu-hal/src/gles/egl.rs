@@ -839,7 +839,7 @@ impl crate::Instance for Instance {
         let egl1_5: Option<&Arc<EglInstance>> = Some(&egl);
         log::debug!("Wayland library: {:#?}", wayland_library);
         let (display, display_owner, wsi_kind) =
-            if let (Some(library), Some(egl)) = (wayland_library, egl1_5) {
+            if let Some(library) = wayland_library {
                 let display = if let Some(egl) = egl1_5 {
                     log::info!("Using Wayland platform");
                     let display_attributes = [khronos_egl::ATTRIB_NONE];
