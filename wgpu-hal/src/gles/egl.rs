@@ -556,6 +556,7 @@ impl Inner {
         }
 
         let (config, supports_native_window) = choose_config(&egl, display, srgb_kind)?;
+        log::debug!("Chosen egl config: {:#?}\nSuppors native window: {}", config, supports_native_window);
 
         let supports_opengl = if version >= (1, 4) {
             let client_apis = egl
@@ -836,7 +837,7 @@ impl crate::Instance for Instance {
 
         #[cfg(Emscripten)]
         let egl1_5: Option<&Arc<EglInstance>> = Some(&egl);
-
+        log::debug!("Wayland library: {:#?}", wayland_library);
         let (display, display_owner, wsi_kind) =
             if let (Some(library), Some(egl)) = (wayland_library, egl1_5) {
                 log::info!("Using Wayland platform");
@@ -897,7 +898,7 @@ impl crate::Instance for Instance {
             } else {
                 log::warn!("EGL_MESA_platform_surfaceless not available. Using default platform");
                 let display = unsafe { egl.get_display(khronos_egl::DEFAULT_DISPLAY) }.unwrap();
-                (display, None, WindowKind::Unknown)
+                (display, None, WindowKind::Wayland)
             };
 
         if desc.flags.contains(wgt::InstanceFlags::VALIDATION)
