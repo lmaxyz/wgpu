@@ -259,12 +259,12 @@ fn choose_config(
                     log::warn!("EGL says it can present to the window but not natively",);
                 }
                 // Android emulator can't natively present either.
-                let tier_threshold = if cfg!(target_os = "android") || cfg!(windows) {
-                    1
-                } else {
-                    2
-                };
-                // let tier_threshold = 1;
+                // let tier_threshold = if cfg!(target_os = "android") || cfg!(windows) {
+                //     1
+                // } else {
+                //     2
+                // };
+                let tier_threshold = 1;
                 return Ok((config, tier_max >= tier_threshold));
             }
             Ok(None) => {
@@ -816,7 +816,7 @@ impl crate::Instance for Instance {
             client_ext_str.split_whitespace().collect::<Vec<_>>()
         );
 
-        let wayland_library = if client_ext_str.contains("EGL_EXT_platform_wayland") || client_ext_str.contains("EGL_KHR_platform_android") {
+        let wayland_library = if client_ext_str.contains("EGL_EXT_platform_wayland") {
             test_wayland_display()
         } else {
             None
