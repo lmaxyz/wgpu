@@ -213,6 +213,10 @@ fn choose_config(
     //TODO: EGL_SLOW_CONFIG
     let tiers = [
         (
+            "presentation",
+            &[khronos_egl::SURFACE_TYPE, khronos_egl::WINDOW_BIT][..],
+        ),
+        (
             "off-screen",
             &[
                 khronos_egl::SURFACE_TYPE,
@@ -220,10 +224,6 @@ fn choose_config(
                 khronos_egl::RENDERABLE_TYPE,
                 khronos_egl::OPENGL_ES2_BIT,
             ][..],
-        ),
-        (
-            "presentation",
-            &[khronos_egl::SURFACE_TYPE, khronos_egl::WINDOW_BIT][..],
         ),
         #[cfg(not(target_os = "android"))]
         (
