@@ -213,10 +213,6 @@ fn choose_config(
     //TODO: EGL_SLOW_CONFIG
     let tiers = [
         (
-            "presentation",
-            &[khronos_egl::SURFACE_TYPE, khronos_egl::WINDOW_BIT][..],
-        ),
-        (
             "off-screen",
             &[
                 khronos_egl::SURFACE_TYPE,
@@ -224,6 +220,10 @@ fn choose_config(
                 khronos_egl::RENDERABLE_TYPE,
                 khronos_egl::OPENGL_ES2_BIT,
             ][..],
+        ),
+        (
+            "presentation",
+            &[khronos_egl::SURFACE_TYPE, khronos_egl::WINDOW_BIT][..],
         ),
         #[cfg(not(target_os = "android"))]
         (
@@ -235,7 +235,7 @@ fn choose_config(
     let mut attributes = Vec::with_capacity(9);
     for tier_max in (0..tiers.len()).rev() {
         let name = tiers[tier_max].0;
-        log::debug!("\tTrying {}", name);
+        log::warn!("\tTrying {}", name);
 
         attributes.clear();
         for &(_, tier_attr) in tiers[..=tier_max].iter() {
