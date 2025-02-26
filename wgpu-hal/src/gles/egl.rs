@@ -853,7 +853,7 @@ impl crate::Instance for Instance {
                     }.unwrap()
                 } else {
                     log::info!("Using Wayland under android platform");
-                    unsafe {egl.get_display(library.display.as_ptr())}.unwrap()
+                    unsafe {egl.get_display(khronos_egl::DEFAULT_DISPLAY)}.unwrap()
                 };
                 (display, None, WindowKind::Wayland)
             } else if let (Some(display_owner), Some(egl)) = (x11_display_library, egl1_5) {
