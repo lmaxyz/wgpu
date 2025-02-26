@@ -816,7 +816,7 @@ impl crate::Instance for Instance {
             client_ext_str.split_whitespace().collect::<Vec<_>>()
         );
 
-        let wayland_library = if client_ext_str.contains("EGL_EXT_platform_wayland") {
+        let wayland_library = if client_ext_str.contains("EGL_EXT_platform_wayland") || client_ext_str.contains("EGL_KHR_platform_android") {
             test_wayland_display()
         } else {
             None
@@ -839,17 +839,21 @@ impl crate::Instance for Instance {
         let egl1_5: Option<&Arc<EglInstance>> = Some(&egl);
 
         let (display, display_owner, wsi_kind) =
-            if let (Some(library), Some(egl)) = (wayland_library, egl1_5) {
-                log::info!("Using Wayland platform");
-                let display_attributes = [khronos_egl::ATTRIB_NONE];
-                let display = unsafe {
-                    egl.get_platform_display(
-                        EGL_PLATFORM_WAYLAND_KHR,
-                        khronos_egl::DEFAULT_DISPLAY,
-                        &display_attributes,
-                    )
-                }
-                .unwrap();
+            if let Some(library) = wayland_library {
+                let display = if let Some(egl) = egl1_5 {
+                    log::info!("Using Wayland platform");
+                    let display_attributes = [khronos_egl::ATTRIB_NONE];
+                    unsafe {
+                        egl.get_platform_display(
+                            EGL_PLATFORM_WAYLAND_KHR,
+                            khronos_egl::DEFAULT_DISPLAY,
+                            &display_attributes,
+                        )
+                    }.unwrap()
+                } else {
+                    log::info!("Using Wayland under android platform");
+                    unsafe {egl.get_display(khronos_egl::DEFAULT_DISPLAY)}.unwrap()
+                };
                 (display, Some(Rc::new(library)), WindowKind::Wayland)
             } else if let (Some(display_owner), Some(egl)) = (x11_display_library, egl1_5) {
                 log::info!("Using X11 platform");
@@ -1018,6 +1022,7 @@ impl crate::Instance for Instance {
                                     ).unwrap()
                                 },
                                 None => {
+                                    log::warn!("Failed to upcast to EGL 1.5, trying to continue with 1.4.");
                                     inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
                                 }
                             }
