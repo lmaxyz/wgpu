@@ -1023,7 +1023,7 @@ impl crate::Instance for Instance {
                                 },
                                 None => {
                                     log::warn!("Failed to upcast to EGL 1.5, trying to continue with 1.4.");
-                                    inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
+                                    inner.egl.instance.get_current_display().unwrap()
                                 }
                             }
                     };
