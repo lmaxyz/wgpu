@@ -264,7 +264,7 @@ fn choose_config(
                 // } else {
                 //     2
                 // };
-                let tier_threshold = 1;
+                let tier_threshold = 1; // Need for Aurora OS
                 return Ok((config, tier_max >= tier_threshold));
             }
             Ok(None) => {
@@ -816,7 +816,7 @@ impl crate::Instance for Instance {
             client_ext_str.split_whitespace().collect::<Vec<_>>()
         );
 
-        let wayland_library = if client_ext_str.contains("EGL_EXT_platform_wayland") {
+        let wayland_library = if client_ext_str.contains("EGL_EXT_platform_wayland") || client_ext_str.contains("EGL_KHR_platform_android") {
             test_wayland_display()
         } else {
             None
@@ -1359,14 +1359,15 @@ impl crate::Surface for Surface {
                     // We don't want any of the buffering done by the driver, because we
                     // manage a swapchain on our side.
                     // Some drivers just fail on surface creation seeing `EGL_SINGLE_BUFFER`.
-                    if cfg!(any(target_os = "android", target_os = "macos"))
-                        || cfg!(windows)
-                        || self.wsi.kind == WindowKind::AngleX11
-                    {
-                        khronos_egl::BACK_BUFFER
-                    } else {
-                        khronos_egl::SINGLE_BUFFER
-                    },
+                    // if cfg!(any(target_os = "android", target_os = "macos"))
+                    //     || cfg!(windows)
+                    //     || self.wsi.kind == WindowKind::AngleX11
+                    // {
+                    //     khronos_egl::BACK_BUFFER
+                    // } else {
+                    //     khronos_egl::SINGLE_BUFFER
+                    // },
+                    khronos_egl::BACK_BUFFER // Need for Aurora OS
                 ];
                 if config.format.is_srgb() {
                     match self.srgb_kind {
