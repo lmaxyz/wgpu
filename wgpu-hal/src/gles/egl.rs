@@ -886,16 +886,21 @@ impl crate::Instance<super::Api> for Instance {
                     let display_attributes = [khronos_egl::ATTRIB_NONE];
 
                     let display = unsafe {
-                        inner
+                        match inner
                             .egl
                             .instance
-                            .upcast::<khronos_egl::EGL1_5>()
-                            .unwrap()
-                            .get_platform_display(
-                                EGL_PLATFORM_WAYLAND_KHR,
-                                display_handle.display.as_ptr(),
-                                &display_attributes,
-                            )
+                            .upcast::<khronos_egl::EGL1_5>() {
+                                Some(egl_1_5) => {
+                                    egl_1_5.get_platform_display(
+                                        EGL_PLATFORM_WAYLAND_KHR,
+                                        display_handle.display.as_ptr(),
+                                        &display_attributes,
+                                    ).ok()
+                                },
+                                None => {
+                                    inner.egl.instance.get_display(display_handle.display.as_ptr())
+                                }
+                            }
                     }
                     .unwrap();
 
