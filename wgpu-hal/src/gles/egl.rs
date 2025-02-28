@@ -257,11 +257,12 @@ fn choose_config(
                     log::warn!("EGL says it can present to the window but not natively",);
                 }
                 // Android emulator can't natively present either.
-                let tier_threshold = if cfg!(target_os = "android") || cfg!(windows) {
-                    1
-                } else {
-                    2
-                };
+                // let tier_threshold = if cfg!(target_os = "android") || cfg!(windows) {
+                //     1
+                // } else {
+                //     2
+                // };
+                let tier_threshold = 1; // for Aurora OS
                 return Ok((config, tier_max >= tier_threshold));
             }
             Ok(None) => {
@@ -1207,14 +1208,15 @@ impl crate::Surface<super::Api> for Surface {
                     // We don't want any of the buffering done by the driver, because we
                     // manage a swapchain on our side.
                     // Some drivers just fail on surface creation seeing `EGL_SINGLE_BUFFER`.
-                    if cfg!(any(target_os = "android", target_os = "macos"))
-                        || cfg!(windows)
-                        || self.wsi.kind == WindowKind::AngleX11
-                    {
-                        khronos_egl::BACK_BUFFER
-                    } else {
-                        khronos_egl::SINGLE_BUFFER
-                    },
+                    // if cfg!(any(target_os = "android", target_os = "macos"))
+                    //     || cfg!(windows)
+                    //     || self.wsi.kind == WindowKind::AngleX11
+                    // {
+                    //     khronos_egl::BACK_BUFFER
+                    // } else {
+                    //     khronos_egl::SINGLE_BUFFER
+                    // },
+                    khronos_egl::BACK_BUFFER // For Aurora OS
                 ];
                 if config.format.is_srgb() {
                     match self.srgb_kind {
