@@ -996,7 +996,7 @@ impl crate::Instance for Instance {
                 if inner
                     .wl_display
                     .map(|ptr| ptr != display_handle.display.as_ptr())
-                    .unwrap_or(true)
+                    .unwrap_or(false)
                 {
                     /* Wayland displays are not sharable between surfaces so if the
                      * surface we receive from this handle is from a different
