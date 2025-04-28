@@ -1038,6 +1038,7 @@ impl crate::Instance for Instance {
                     inner.wl_display = Some(display_handle.display.as_ptr());
 
                     drop(old_inner);
+                    inner.egl.make_current();
                 }
             }
             #[cfg(Emscripten)]
