@@ -851,7 +851,7 @@ impl crate::Instance for Instance {
                         )
                     }.unwrap()
                 } else {
-                    log::info!("Using Wayland under android platform");
+                    log::warn!("EGL 1.5 is not available, trying to continue with 1.4");
                     unsafe {egl.get_display(khronos_egl::DEFAULT_DISPLAY)}.unwrap()
                 };
                 (display, Some(Rc::new(library)), WindowKind::Wayland)
@@ -1004,41 +1004,40 @@ impl crate::Instance for Instance {
                      *
                      * See gfx-rs/gfx#3545
                      */
-                    // log::warn!("Re-initializing Gles context due to Wayland window");
+                    log::warn!("Re-initializing Gles context due to Wayland window");
 
-                    // use std::ops::DerefMut;
-                    // let display_attributes = [khronos_egl::ATTRIB_NONE];
+                    use std::ops::DerefMut;
+                    let display_attributes = [khronos_egl::ATTRIB_NONE];
 
-                    // let display = unsafe {
-                    //     match inner
-                    //         .egl
-                    //         .instance
-                    //         .upcast::<khronos_egl::EGL1_5>() {
-                    //             Some(egl) => {
-                    //                 egl.get_platform_display(
-                    //                     EGL_PLATFORM_WAYLAND_KHR,
-                    //                     display_handle.display.as_ptr(),
-                    //                     &display_attributes,
-                    //                 ).unwrap()
-                    //             },
-                    //             None => {
-                    //                 log::warn!("Failed to upcast to EGL 1.5, trying to continue with 1.4.");
-                    //                 inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
-                    //             }
-                    //         }
-                    // };
+                    let display = unsafe {
+                        match inner
+                            .egl
+                            .instance
+                            .upcast::<khronos_egl::EGL1_5>() {
+                                Some(egl) => {
+                                    egl.get_platform_display(
+                                        EGL_PLATFORM_WAYLAND_KHR,
+                                        display_handle.display.as_ptr(),
+                                        &display_attributes,
+                                    ).unwrap()
+                                },
+                                None => {
+                                    log::warn!("Failed to upcast to EGL 1.5, trying to continue with 1.4.");
+                                    inner.egl.instance.get_display(display_handle.display.as_ptr()).unwrap()
+                                }
+                            }
+                    };
 
-                    // let new_inner = Inner::create(
-                    //     self.flags,
-                    //     Arc::clone(&inner.egl.instance),
-                    //     display,
-                    //     inner.force_gles_minor_version,
-                    // )?;
-
-                    // let old_inner = std::mem::replace(inner.deref_mut(), new_inner);
+                    let new_inner = Inner::create(
+                        self.flags,
+                        Arc::clone(&inner.egl.instance),
+                        display,
+                        inner.force_gles_minor_version,
+                    )?;
+                    let old_inner = std::mem::replace(inner.deref_mut(), new_inner);
                     inner.wl_display = Some(display_handle.display.as_ptr());
 
-                    // drop(old_inner);
+                    drop(old_inner);
                 }
             }
             #[cfg(Emscripten)]
